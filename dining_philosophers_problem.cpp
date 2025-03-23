@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <iostream>
 #include <ctime>
+#include <vector>
 
 #define THINKING 0
 #define HUNGRY 1
@@ -14,13 +15,15 @@ struct Philosopher
     int state;         // THINKING, HUNGRY, EATING
 };
 
+std::vector<Philosopher> philosophers;
+
 void think(Philosopher *philosopher)
 {
     philosopher->state = THINKING;
     std::cout << "Philosopher number " << philosopher->philosopherID << " is thinking\n";
 }
 
-bool test(Philosopher *philosopher, int numberOfPhilosophers, Philosopher *philosophers)
+bool test(Philosopher *philosopher, int numberOfPhilosophers)
 {
     // Philosopher can only eat if their neighbors are not eating
     int left = (philosopher->philosopherID + numberOfPhilosophers - 1) % numberOfPhilosophers;
@@ -29,12 +32,12 @@ bool test(Philosopher *philosopher, int numberOfPhilosophers, Philosopher *philo
     return philosophers[left].state != EATING && philosophers[right].state != EATING;
 }
 
-void pickUpChopsticks(Philosopher *philosopher, int numberOfPhilosophers, Philosopher *philosophers)
+void pickUpChopsticks(Philosopher *philosopher, int numberOfPhilosophers)
 {
     std::cout << "Philosopher number " << philosopher->philosopherID << " picks up chopsticks\n";
 }
 
-void putDownChopsticks(Philosopher *philosopher, int numberOfPhilosophers, Philosopher *philosophers)
+void putDownChopsticks(Philosopher *philosopher, int numberOfPhilosophers)
 {
     std::cout << "Philosopher number " << philosopher->philosopherID << " puts down chopsticks\n";
 }
@@ -50,11 +53,20 @@ int main(int argc, char *argv[])
     int numOfPhilosophers = std::stoi(argv[1]);
     std::cout << "Number of philosophers: " << numOfPhilosophers << "\n";
 
-    Philosopher philosophers[numOfPhilosophers];
-    Philosopher p1 = {1, time(0), THINKING};
-    think(&p1);
-    pickUpChopsticks(&p1, numOfPhilosophers, philosophers);
-    putDownChopsticks(&p1, numOfPhilosophers, philosophers);
+    philosophers.resize(numOfPhilosophers);
+    for (int i = 0; i < numOfPhilosophers; ++i)
+    {
+        philosophers[i].philosopherID = i;
+        philosophers[i].timeHungry = 0;
+        philosophers[i].state = THINKING;
+    }
+
+    for (int i = 0; i < numOfPhilosophers; ++i)
+    {
+        think(&philosophers[i]);
+        pickUpChopsticks(&philosophers[i], numOfPhilosophers);
+        putDownChopsticks(&philosophers[i], numOfPhilosophers);
+    }
 
     return 0;
 }
