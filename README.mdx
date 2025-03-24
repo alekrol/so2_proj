@@ -10,7 +10,40 @@
 
 ## Solution
 
-- test - checks if the philosopher can eat (both chopsticks are not in use)
-- pickUpChopsticks - philosopher is trying to eat (and becomes HUNGRY)
-- putDownChopsticks - philosopher is done eating
--
+We need to ensure that a philosopher sets their state to EATING only if it's
+safe to do so.
+
+There are 3 states philosophers can be in:
+
+1. THINKING
+2. HUNGRY
+3. EATING
+
+Life cycle of a philosopher: THINKING -> HUNGRY -> EATING -> repeat
+
+<br>
+or in other words: 
+<br>
+think (sleep (1)) -> pick up chopsticks -> eat (sleep (1)) -> put down
+chopsticks -> repeat
+
+We need to implement the following functions:
+
+1. `test` function checks if a philosopher can start eating based on the states
+   and waiting times of their neighbors
+   - checks if neighbors are eating
+   - checks if neighbors are hungry and waiting longer than the philosopher who
+     wants to eat
+2. `pickUpChopsticks`
+   - set state to HUNGRY
+   - waits until notified by
+   - eats if `test` returns true
+3. `putDownChopsticks`
+   - sets state to THINKING
+   - notifies neighbors
+4. `philosopherThread`:
+   - think (sleep)
+   - pickUpChopsticks
+   - eat (sleep)
+   - putDownChopsticks
+   - repeat
