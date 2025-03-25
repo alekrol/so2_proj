@@ -4,6 +4,7 @@
 #include <ctime>
 #include <vector>
 #include <unistd.h>
+#include <fstream>
 
 #define THINKING 0
 #define HUNGRY 1
@@ -19,12 +20,11 @@ struct Philosopher
 std::vector<Philosopher> philosophers;
 pthread_mutex_t mMutex;
 std::vector<pthread_cond_t> conditions;
+std::ofstream testFile;
 
 void think(Philosopher *philosopher)
 {
     philosopher->state = THINKING;
-    // std::cout << "Philosopher number " << philosopher->philosopherID << " is thinking\n";
-    // sleep(1);
 }
 
 bool test(Philosopher *philosopher, int numberOfPhilosophers)
@@ -32,17 +32,8 @@ bool test(Philosopher *philosopher, int numberOfPhilosophers)
     int left = (philosopher->philosopherID + numberOfPhilosophers - 1) % numberOfPhilosophers;
     int right = (philosopher->philosopherID + 1) % numberOfPhilosophers;
 
-    time_t timeNow = time(0);
-    const int ms = 1000;
-
     // Philosopher can only eat if their neighbors are not eating
     if (philosophers[left].state == EATING || philosophers[right].state == EATING)
-        return false;
-
-    // Philosopher can only eat if their neighbors are not hungry for more than 5 ms
-    if ((timeNow - philosophers[left].timeHungry) >= 5 && philosophers[left].state == HUNGRY)
-        return false;
-    if ((timeNow - philosophers[right].timeHungry) >= 5 && philosophers[right].state == HUNGRY)
         return false;
 
     return true;
@@ -65,7 +56,11 @@ void pickUpChopsticks(Philosopher *philosopher, int numberOfPhilosophers)
     }
 
     philosopher->state = EATING;
-    std::cout << "Philosopher number " << philosopher->philosopherID << " is eating\n";
+    std::cout << "Philosopher number " << id << " is eating\n";
+
+    testFile << id << "\n";
+    testFile.flush();
+
     pthread_mutex_unlock(&mMutex);
 }
 
@@ -75,7 +70,7 @@ void putDownChopsticks(Philosopher *philosopher, int numberOfPhilosophers)
 
     pthread_mutex_lock(&mMutex);
     think(philosopher);
-    std::cout << "Philosopher number " << philosopher->philosopherID << " is thinking\n";
+    std::cout << "Philosopher number " << id << " is thinking\n";
 
     int left = (id + numberOfPhilosophers - 1) % numberOfPhilosophers;
     int right = (id + 1) % numberOfPhilosophers;
@@ -114,6 +109,7 @@ int main(int argc, char *argv[])
 
     int numOfPhilosophers = std::stoi(argv[1]);
     std::cout << "Number of philosophers: " << numOfPhilosophers << "\n";
+    testFile.open("testFile.csv");
 
     philosophers.resize(numOfPhilosophers);
     conditions.resize(numOfPhilosophers);
@@ -139,6 +135,7 @@ int main(int argc, char *argv[])
     {
         pthread_cond_destroy(&conditions[i]);
     }
+    testFile.close();
 
     return 0;
 }
