@@ -29,15 +29,12 @@ chopsticks -> repeat
 
 We need to implement the following functions:
 
-1. `test` function checks if a philosopher can start eating based on the states
-   and waiting times of their neighbors
-   - checks if neighbors are eating
-   - checks if neighbors are hungry and waiting longer than the philosopher who
-     wants to eat
+1. `test` checks if a philosopher can start eating
+   - returns true if neighbors are not eating
 2. `pickUpChopsticks`
-   - set state to HUNGRY
-   - waits until notified by
-   - eats if `test` returns true
+   - sets state to HUNGRY
+   - waits
+   - sets state to EATING
 3. `putDownChopsticks`
    - sets state to THINKING
    - notifies neighbors
