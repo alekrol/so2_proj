@@ -1,0 +1,64 @@
+# Simple HTTP 1.1 Server with CRUD Operations
+
+## Concurrency
+
+- Only one thread can modify database at the time.
+  [`std::lock_guard lock()`](https://en.cppreference.com/w/cpp/thread/lock_guard.html)
+  used to ensure thread-safe access to shared resources.
+
+- Each client gets its own thread to handle requests.
+
+## Testing
+
+### Build and Run
+
+```bash
+g++ -std=c++17 -pthread http-server.cpp -o http-server
+
+./http-server
+```
+
+### Create Resource (POST)
+
+#### Using auto-generated reasource ID
+
+```bash
+curl -X POST -d "Test data" http://localhost:8080/resource
+```
+
+OR
+
+#### Using specified resource ID
+
+```bash
+curl -X POST -d "Test data" http://localhost:8080/resource/<resource_id>
+```
+
+### Get Resource (GET)
+
+```bash
+curl http://localhost:8080/resource/<resource_id>
+```
+
+### Update Resource (PUT)
+
+```bash
+curl -X PUT -d "Updated data" http://localhost:8080/resource/<resource_id>
+```
+
+### Delete Resource (DELETE)
+
+```bash
+curl -X DELETE http://localhost:8080/resource/<resource_id>
+```
+
+### HTTP Response Codes
+
+| Code | Description        | Example Operation              |
+| ---- | ------------------ | ------------------------------ |
+| 200  | OK                 | Successful GET, PUT, or DELETE |
+| 201  | Created            | Successful POST                |
+| 400  | Bad Request        | Invalid request format         |
+| 404  | Not Found          | Resource doesn't exist         |
+| 405  | Method Not Allowed | Unsupported HTTP method        |
+| 409  | Conflict           | Resource ID already exists     |
